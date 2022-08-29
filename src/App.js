@@ -1,23 +1,56 @@
-import logo from './logo.svg';
+import { useState } from 'react';
+import { marked } from 'marked';
 import './App.css';
 
 function App() {
+  const [text, setText] = useState(`
+  # Markdown Previewer
+
+  ## Very Exciting Stuff
+
+  ### Really, very exciting.
+
+  [Here's a Markdown Cheatsheet](https://www.markdownguide.org/cheat-sheet/)
+
+  This is an example of some html code: \`<div></div>\`
+
+
+  
+  \`\`\`
+  //This is some multi-line code!
+{
+  "firstName": "Lydia",
+  "lastName": "Krauz",
+  "age": 27
+}
+\`\`\`
+
+- Whoa a list
+- Here it is again
+- A very nice list
+- ~nevermind I hate it.~
+
+> “What will I gain from criticizing this absurd reality?"
+-Obito (RIP)
+
+![RIP Obito](data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJAA6wMBIgACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAACAQMEBQYAB//EAD4QAAIBAwIEAwUGBAUDBQAAAAECAwAEESExBRJBURMiYQYyQnGBFCNSkaGxFcHR8TNiguHwJGNyByU0Q1P/xAAaAQACAwEBAAAAAAAAAAAAAAAAAQIDBAUG/8QAJREAAgICAgEEAgMAAAAAAAAAAAECEQMEITESBRNBUTJhFSIj/9oADAMBAAIRAxEAPwCPO/UdKrbmRnOrU7LcH3hp6VXzynOe+9U0Wjkk2pHYVCllyTQySVHLkipUIVmyTQE0Jag5vNU0QbDZsaU0PM+ANTSE8xwNyasbWARrk6sf0pN0CAhQRrg7nelLgKRipIUdqFkUbiqrtk6IBYliKJFYoc7UcyqZNNKZmnkhcAAMhGgPSpJXwRbBReWT1qwt7hJIsq2SOh3FV0MyGQFvKc9aZBZJGaNsMG3FSWNy4F5UXDziOB5Dso/Wg4fMZocN76nDetQLi7NxGicnIQcvjY0NpdG2kLchYMMEA41o9p+I3KpF2SApJOANyaq7u4SdisXMwX4qjT3Ek5zIQANlXajhaJLc8zDxG6dqPbaXIedhIvanY1xTcU8Q3P6U4JBKMqdO9RpjHLhsQOx06Vnrlss1XnEmH2ZRnWqCc5NTXQDHWu3rjSqNaYEqzTmcaVprBOWNm9MVR8PXzKK0SARwqO9RbAcY00xomNMyE81UpEmO0OVpkymg8Q1ILJ0spqLJJSyMSaju2tTEczZppmxvRE0zIakhWIzjvTbHuKFgdxQSsQhxTIhJOBIFA+tXNu/Mi61mxkMMVbWExOATUJDRbDHWmLmVI0Lu2FH1pwp4g6/Sol5ABExJ0Peq65Jt8EWS6iaTRiR6KaburgTYCqwx1OKaKhT92c9wNqUHTOgFaYQXZS2dgEa1wA05RitBwT2TvOIxJc3Ui2FmdVlmGXcd1X+ZrS2vs/7PWe9vNfPn353wPoBVeXdw4u3yXYtPNl/FHnOR3FKNdq9V5eHKMLwmxVexjzUeex4PcjE3B7f/AMomKmsy9Vwvs0v0rMkeZaYrselba79j7C414bePaSf/AJ3I5kP+oaispxDh15w24MF7A0bg6HdXHcNsf371sxbOLN+LMmXWyYvyRCOCeX3R1J61IiaRgqoBgUyQGAzqOlLbGRZQsGWbsdhUpxvkqi6D4o+gU9BVLIcmrLichJPN72xxVUx1qBYd1o0XLChFPW68zigZc8IQNINMirac5ZQNhUXhKBYi2NRTkrlTVcvoaHGamnbNMtKzHSg5zjWo0ATE5NBzUJdjspNdiX8BqQD7NpTTMObejao7yNzbaVKhWHzZzTMhos6Gmnbl33qRAQnAwd6B9Rik5tTS70hjTLpTlo5RwDSMNKb90gigDQRM8kfKjhT3K5qNe2zRxNPc3OVQZOV0/KhsZ9NcjG9R+Iw3fFHxnwbOPXzbt64qHTsl2VdvdFi8874jXRRjFb72S4KiW8XFOIQ80snmt4JBoq9GYfsKxvsjwqLi/tJDA/M9nCTPMT1Rdf1OB9a9TuZWKyS8qhz7q5wM9B8qzb+1KEVjj2zdoascsvOfSFuLjzc8zMzHbTJ+lMh7g+5EFH/cbBordGVAZWLOdWOdj2HYUTSIuOZgo9a4Tfyd9LgALcdWiHyBpVEwcFyjL8jSmaMDJb5UqyI/uup9AaVhSQjyohAkyM7NjQfOlniiubZrW5QSwONUPT1B6Gj0IxuOoPWo6A27gA/dNsD8JqUZOLtdinFSXjLlHm3tRaS8KuzEsjADzRMR76/1qJwe/JuJEmPmI8pxvW99sOEDivDE8JR48L8yn0OjD/navPhwwxvIkvMOsTg7EHUV6HV2Pexpvs83t63sZKXT6OvGLM2d81ENOzFs4fcaZ701WgzBA4qbZRksKhJqQKueDx80ykjSgC5jXwbUDqaYmbKY61InPmONh0qDIWLZxVb7GJBG7N6VMSzJ1NHYrgDSrECoORJIgeCI9hRctPy6tjFDy0vJjop2btTMjYGMDJrsk70LHAz2rQipiFsL61HBLE5pw5J1/KmyOV8DagR2CKU7VwFduKQxE8wOaBhrTkehIpGFAD1nKVbHQ1ZXayXNl4MB5A+jP2XrVMuQcirS0m+7wTUJIaZpvYnhcPDuG3c8S4aVliDHcga/virSX7y6jTcIOcj9B/Om+CD/ANktx+J3b9abNz4NxxCUjPhImB30zj9a4m03PMz0WpFQwL9kpyzuY4mwo99sa/L50ii3gJAILHfOp+tMwsGRYy/LyjM7becjJGe/epCNDFECg8p6opb9hWRo1p2KJ4urgfPSlaOOQaqD6jeuV45R5Crjt/tQMhiUmEdc8nTHXFIZzF45gWIaFvzQ/wAxTkyeLGyHQtt6H+9JlJY9PMrCkt2LQjmPmBKn5ihjX0Ih8WAZ+IEH51g+PYhldB0YkZrd2+nip+GQ4+utYD2vYJxFlB3AJ/auj6c/9Gjm+ppPEn9Gcc5Y5NDSnU5rgM12jhCxe+K0fBx5SQNqobVcuO9afhSiO1dmGp0pMApG83zqJcSEe6KlucNpUO9wFyp1qsZY8OJcDOlWYFVXDXAjU9asc5Oarl2TQEn+JXZNAzP4nu6UeaQzOimy2prmfXSgJ1rUygXOTk0JBzk1xND4ik8uaVjCO1CD0riy96EEZ0oAMeVtaI4xTTMOp1ofEHqaAocNPRShBTAYY2NJq2ymgD0vgjBuCWeOqtn86q+MT/Zv4kRqT4RUd+lTfZhufgFv3V2U+mtVvtlHLFbtc2+gZApI1wQcrXBkr2WmeixutVNE2wmgj8GCZ0M2MsHkA1OpIHXerNJvMqyKYyfdOcg/WvFhcTeP45mcTc3Nzk65r1f2eun4nwiGS6yWdASSP+dqntantR8rI6m570nGizmh5yGUcsg2b1oonMkXNseo9RSRMHTOuc8pz6UkOjSL2b+VYDeDD93cSxdD5x9d6ASLDNOZGABKsMddMEfpTpGLlD3Qj9qaVFN+0mAXWMDP4c00Ji2ofxJmfIZiGKn4dNBXm/tY/Nxu6H4WxXpcP/yJh2K/tXlntC/Pxe8bvKa6PpyvK2c31J1iS/ZXdKVaGursnEJlkvnB9a0xHg2sYO7b1n+GLzOoPetFfxyERhVyAKT6AFsBT00qruzgZzpUxhMRjlNRpbaU/BVa4GSuGOrYGatweVTWetlmgfm5DirEXsmPNHpUZKySZM5wdqKoH2h+kRpz7VJ+Co0x2jPcjUvhVOS3c+6mafTh8zfD+lX2VlZ4Omtd4C1eR8JY75+VTI+CjGSM0rAzS2wOwzTi2bHZK1C8MC/AKeWyPRKHIDLpYM3wVJi4WfiGlaP7EwOgFGLMgZYgDrSsZQrwyLqtJPHBbLiTlJ6Luaf4lxGOM+FZkO2zSHYfLvVOxLOzMxJO5NFl+PA5dms9lbnns5ojHyqs2V7HI/erieCO4iaKZA8bjDKetUXsn4dxw69t2JDxypKpAzjTH71dRtJGvJJG5YfEpBBrh7irL5I7urSx+D6MtcewdnLcl455I4iclNz+daWwt47dTHAoEcYCJ8h/w0crTujeAnIe71zSKkRjiwZdgudf7f0qqebJkVSZPHgx423FUFbHmjZu7kj86NQvM5XcnWkUCGEDOijXNJb6RAndzzGqS8buGlE8awoGYq3vHAHqaG1QrPKObmIClz3Y6mnFBe6c9FUKPmaS2I5Z5h7ryM30Gn8ql8UQrkSNuUXEzbc5/Qf7V5nfWf2mV5428zsWIOxzXofFJvs/BppNsx6A9z/esSo2Ub7V0vTlw5GLcipVFmelikifldeU0g0rUrYCcEXC4Xt1qDf8CYeeyPMB8D7/AErqqaZy8mpNcxGuC4M4B71sfDLKO1Y3hBMdyvOMEHBBG1eg2irJGNKcujL80yAIcdM1zRqPeWrcW4Pw/lXG0Vh7pqkZS8kf4aRoIzryVbGwGdqX7AKdgU3hgaItJyN+EVdfw7NF/DTSsKGY7CNNlFSVhQaBBUkIKLlUHUZp2BG8FRuBXYA6aVJwjHGMUbwxFhrpSAhgA9BQmRFbGmalSRxIBg5pAbfGDCCaAIU97BBHzu2AdAANT8hVNfXb3Y5CCsR+AHf50xxm+ROLSQSeWNAoRugyKRSGAKkFe9D4OhqYoSXk3z9ACCIf/Wv5VzrEilmVQB6U529agX0hZ+Tou9BulUV0O8Ju5YeKxmBhGJ3ETZGmCev6Vs/ElUhXtz5dymCM157qCCDgjr2rU2PFOKTWyXLwJcqxIJj0IPqKwb2JySkkGvOnTLkySscLER6uQMUscfK3Mx5pNiT27Cq0cSv2OF4W+e7HSjji4jdn/qpFgh6pGfMfrXN8K7NilfRNkxM4jXVQcuRt8qclkWKIu2yD+1dFGsKBIxyouwprWaQMy/cocjPxHvUSQilobVnb/EILH5nakZDDaxwA5Jwn9TSufGuAg92PWTPfoP50sZ8W6YjVY/L/AKutMT6KX2vn5ILe2U++3Ow/ygf1x+VUlgU5iMDnGxNOccuhdcTldWyiYjT5CoCkqQQcGu3q43DErMGSaeRsuRjBxXYpqCYSpnqN6eO1XlqdoiXNlHMwlUcso6jr86vODXOYjG2joNV7VWkEZ6Ypi6u47KMTvIEYDQ9T6U7+DHs60ZLyXBrluFxuKX7QBVBbS3FxEssaMVYA7bVKTxxoynNBymWhue2KH7UfSoP3g3BpVyPMRrSAnC5Pai+0mq5pG7Giy9AFoJFxvQNMBogJphWGdq5puVhyrQA+XfGcYNNktjJOtFzGQZJx6UhFAAjmbTNA3MDjrTvL1zQcoyc0AY/2nhaPiYdsEPED+Wn9KrYLiWAjwmwOqnUGtD7XwMEt5gNFJUn5/wBqzNaYU4kFJwdpltFxGJ1PiHkfGx2qI7F2LdzvUXpjApBlTlCVP6VF4vo2R3m1U0Sj6j6VYcH4yeG3awSjmgmOuN1bYGqgTFR94M+opi8dXZCCDuMVTPD5rxaL3sKMfOD6PRZONWUTFZZGRh0ZCDTI47FM3h2kE0z9OUafnVRwT2mtltI7fiYJmXyrJycwYdM1eRcZsmX7gSH/ACpCa4eXB7cqcTqYthZVakOxQ3Fx5r1hHGNoYzoT/mPWnppuQrHFgyn3VxsB1PpTIlu7k/dwm3jPxy+99F/qadLQ2uA7lpXONdWc1S0/kutfAhH2aALGeeRjoTuzGqv2h4inCOFeDE//AFDqVU9cndqnXdzFYQveXhwQCEUHb0HrXnPE72biNzJdT7tsvRR0Fa9TX92VvpGPc2fZjS7ZLQYUfKioSyoMOwHzNAZx8ClvXYV2fFvoxucYrlkmGUwyAjONiO9Tpry3tkDzyqqnbO9UcjyMpDPyLjpp+tUt3IjviMeUfExyTUvb+yt7yjxHkub72jY5SyQr/wBx/wCQqm557+8iWWR5ZJHC5Y53NR6vvYqx+28fhJ9yAGVvptTpJGOeaeV/2Z6pa5htUhCqAqgbUhQk5xinUXmGU1NMzTvG2ChJ9KpfJE5os7jWhNuMbCmZuIFFx4Lk+lN/a5/CLGBwBQBK+zeXOBTf2f5VVSX17cOFt4XHzFc38QDEcp/OigJPj9hRrNka1HFo+CWk5cUzeWskaK8E3Oeop0IsPG06imzca6Gqy3uLtgyvFkDrUiEENg9elIZL+0GiM5NAI8HanEjLHGKBFdxwPPw2Yb8oDD6VkBt+tehTcPeeNkDKFZcGsBJG0UrxN7yMVP0q/F1RGSBrq6uq4gdQsit7wBoq6gBkwYPMjEEd9asbDi15a+RpCEPxhv3qJUnhyh7kq4Dc0baMM9qpzYoTj/ZGnWyTWRKL7Lq04o1yQJ+Lwwr182T+1TV4twSwUulx48+NxlmY/OscY0DHCKMHtXYrH/HQfzwav5LJHiuSRxfiN1xa555MJEvuJnaoQtxr4jF8/Snq6t2PHHHHxiYMuSWSflLsEKBsKViFXmYgY3zQTzJAvNIQOw71UXV007YJKx/h71LohyHfXvjHkjJEffvUSurqgM6t9/6cWGLW5v2H+I/hp8hv+tYHOPU9BXr/ALPWwsOEWtqo92Mc2O51NRn0SRYtI0S+TOfSmxIxGWDZNGZCG0GaUyk/DVJIjtI3MMRkjvinjc+XlIKjrkUviNy6D9K7mdgQcYPpTAajuUQ+QgULTczE8w19aGW0BOcaVH/hy/jP50Af/9k=)
+
+**This was fun! That's why it's bolded!**
+  
+  `);
+
+  marked.setOptions({
+    breaks: true
+  })
+  
   return (
+
+
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <textarea id="editor" onChange={(event) => {setText(event.target.value);}} value={text}></textarea>
+      <div id="preview" dangerouslySetInnerHTML={
+        {__html: marked(text),}
+      }></div>
     </div>
   );
 }
